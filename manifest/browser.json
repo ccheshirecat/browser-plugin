@@ -1,0 +1,35 @@
+{
+  "$schema": "https://volant.dev/schemas/plugin-manifest-v1.json",
+  "schema_version": "1.0",
+  "name": "browser",
+  "version": "0.1.0",
+  "runtime": "browser",
+  "enabled": true,
+  "image": "ghcr.io/volant-plugins/browser:0.1.0",
+  "image_digest": "sha256:TODO",
+  "initramfs": {
+    "url": "https://example.com/browser-initramfs-0.1.0.tar.gz",
+    "checksum": "sha256:TODO"
+  },
+  "kernel": {
+    "url": "https://example.com/vmlinux-0.1.0",
+    "checksum": "sha256:TODO"
+  },
+  "resources": {
+    "cpu_cores": 2,
+    "memory_mb": 2048
+  },
+  "actions": {
+    "navigate": {
+      "description": "Navigate to URL",
+      "method": "POST",
+      "path": "/v1/browser/navigate",
+      "timeout_ms": 60000
+    }
+  },
+  "health_check": {
+    "endpoint": "/healthz",
+    "timeout_ms": 5000
+  },
+  "openapi": "https://example.com/openapi.json"
+}

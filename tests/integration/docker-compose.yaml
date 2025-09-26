@@ -1,0 +1,15 @@
+services:
+  browser:
+    platform: linux/amd64
+    build:
+      context: ../..
+      dockerfile: runtime/Dockerfile
+      args:
+        AGENT_BINARY: ${AGENT_BINARY:-runtime/browser-agent.bin}
+    image: ${BROWSER_PLUGIN_IMAGE:-browser-plugin-smoke:local}
+    ports:
+      - "${BROWSER_PLUGIN_PORT:-18080}:8080"
+    shm_size: "2gb"
+    environment:
+      VOLANT_AGENT_RUNTIME: browser
+      VOLANT_AGENT_DEFAULT_TIMEOUT: 30s

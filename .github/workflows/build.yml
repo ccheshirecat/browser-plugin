@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: agent/go.mod
+      - name: Go fmt
+        run: |
+          cd agent
+          gofmt -w ./
+      - name: Go test
+        run: |
+          cd agent
+          go test ./...
+      - name: Placeholder build
+        run: echo "TODO: build OCI image and initramfs"
