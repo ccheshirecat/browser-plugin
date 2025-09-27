@@ -6,22 +6,168 @@
   "runtime": "browser",
   "enabled": true,
   "image": "ghcr.io/volant-plugins/browser:dev",
-  "image_digest": "sha256:TODO",
+  "image_digest": "sha256:adcbf240a42ca35d42501f5110c541de6710e346377cb8f9394dab22c32e9f0",
   "initramfs": {
-    "url": "https://example.com/browser-initramfs-dev.tar.gz",
-    "checksum": "sha256:TODO"
+    "url": "https://registry.volant.cloud/repository/browser-plugin/981de8eb0f92b205bef3e73d9c45c7d4da23bf9184d267f702ca072616e3ccab/browser.initramfs.cpio.gz",
+    "checksum": "sha256:981de8eb0f92b205bef3e73d9c45c7d4da23bf9184d267f702ca072616e3ccab"
   },
   "kernel": {
-    "url": "https://example.com/vmlinux-dev",
-    "checksum": "sha256:TODO"
+    "url": "https://registry.volant.cloud/repository/browser-plugin/782a61a99df82b74100a687adcac23e6299aa6532f536a15d66a15d6c6aff04c5a9f74/browser.vmlinux",
+    "checksum": "sha256:782a61a99df82b74100a687adcac23e6299aa6532f536a15d66a15d6c6aff04c5a9f74"
   },
   "resources": {
     "cpu_cores": 2,
     "memory_mb": 2048
   },
-  "actions": {},
+  "workload": {
+    "type": "http",
+    "base_url": "http://127.0.0.1:8080",
+    "env": {
+      "VOLANT_AGENT_PORT": "8080"
+    }
+  },
+  "actions": {
+    "navigate": {
+      "description": "Navigate the browser to a URL",
+      "method": "POST",
+      "path": "/v1/browser/actions/navigate",
+      "timeout_ms": 60000
+    },
+    "reload": {
+      "description": "Reload the current page",
+      "method": "POST",
+      "path": "/v1/browser/actions/reload",
+      "timeout_ms": 30000
+    },
+    "back": {
+      "description": "Navigate back in history",
+      "method": "POST",
+      "path": "/v1/browser/actions/back",
+      "timeout_ms": 15000
+    },
+    "forward": {
+      "description": "Navigate forward in history",
+      "method": "POST",
+      "path": "/v1/browser/actions/forward",
+      "timeout_ms": 15000
+    },
+    "viewport": {
+      "description": "Set viewport dimensions",
+      "method": "POST",
+      "path": "/v1/browser/actions/viewport",
+      "timeout_ms": 30000
+    },
+    "user_agent": {
+      "description": "Override the active user agent",
+      "method": "POST",
+      "path": "/v1/browser/actions/user-agent",
+      "timeout_ms": 30000
+    },
+    "wait_navigation": {
+      "description": "Wait for the current navigation to complete",
+      "method": "POST",
+      "path": "/v1/browser/actions/wait-navigation",
+      "timeout_ms": 60000
+    },
+    "screenshot": {
+      "description": "Capture a PNG/JPEG screenshot",
+      "method": "POST",
+      "path": "/v1/browser/actions/screenshot",
+      "timeout_ms": 60000
+    },
+    "click": {
+      "description": "Click a DOM element",
+      "method": "POST",
+      "path": "/v1/browser/dom/click",
+      "timeout_ms": 30000
+    },
+    "type": {
+      "description": "Type into a DOM element",
+      "method": "POST",
+      "path": "/v1/browser/dom/type",
+      "timeout_ms": 45000
+    },
+    "get_text": {
+      "description": "Get text content from a selector",
+      "method": "POST",
+      "path": "/v1/browser/dom/get-text",
+      "timeout_ms": 45000
+    },
+    "get_html": {
+      "description": "Get HTML from a selector",
+      "method": "POST",
+      "path": "/v1/browser/dom/get-html",
+      "timeout_ms": 45000
+    },
+    "get_attribute": {
+      "description": "Get an attribute from a selector",
+      "method": "POST",
+      "path": "/v1/browser/dom/get-attribute",
+      "timeout_ms": 45000
+    },
+    "wait_selector": {
+      "description": "Wait for a selector to appear/meet criteria",
+      "method": "POST",
+      "path": "/v1/browser/dom/wait-selector",
+      "timeout_ms": 60000
+    },
+    "evaluate": {
+      "description": "Evaluate JavaScript in the page context",
+      "method": "POST",
+      "path": "/v1/browser/scripts/evaluate",
+      "timeout_ms": 60000
+    },
+    "scrape": {
+      "description": "Scrape text or attribute from selector",
+      "method": "POST",
+      "path": "/v1/browser/actions/scrape",
+      "timeout_ms": 60000
+    },
+    "graphql": {
+      "description": "Proxy a GraphQL POST request",
+      "method": "POST",
+      "path": "/v1/browser/actions/graphql",
+      "timeout_ms": 60000
+    },
+    "profile_attach": {
+      "description": "Attach profile cookies/storage",
+      "method": "POST",
+      "path": "/v1/browser/profile/attach",
+      "timeout_ms": 60000
+    },
+    "profile_extract": {
+      "description": "Extract profile cookies/storage",
+      "method": "GET",
+      "path": "/v1/browser/profile/extract",
+      "timeout_ms": 30000
+    },
+    "devtools": {
+      "description": "Fetch DevTools websocket info",
+      "method": "GET",
+      "path": "/v1/devtools",
+      "timeout_ms": 15000
+    },
+    "logs": {
+      "description": "Stream agent logs",
+      "method": "GET",
+      "path": "/v1/logs/stream",
+      "timeout_ms": 60000
+    },
+    "health": {
+      "description": "Health probe",
+      "method": "GET",
+      "path": "/healthz",
+      "timeout_ms": 5000
+    }
+  },
   "health_check": {
     "endpoint": "/healthz",
     "timeout_ms": 5000
+  },
+  "openapi": "https://volant.dev/plugins/browser/openapi.yaml",
+  "labels": {
+    "volant.plugin": "browser",
+    "volant.runtime": "browser",
+    "volant.manifest.version": "0.1.0-dev"
   }
 }
