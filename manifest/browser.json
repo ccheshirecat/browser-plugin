@@ -5,15 +5,19 @@
   "version": "0.1.0",
   "runtime": "browser",
   "enabled": true,
-  "image": "ghcr.io/volant-plugins/browser:0.1.0",
-  "image_digest": "sha256:adcbf240a42ca35d42501f5110c541de6710e346377cb8f9394dab22c32e9f0",
+  "image": "",
+  "image_digest": "",
+  "rootfs": {
+    "url": "",
+    "checksum": ""
+  },
   "initramfs": {
-    "url": "https://registry.volant.cloud/repository/browser-plugin/981de8eb0f92b205bef3e73d9c45c7d4da23bf9184d267f702ca072616e3ccab/browser.initramfs.cpio.gz",
-    "checksum": "sha256:981de8eb0f92b205bef3e73d9c45c7d4da23bf9184d267f702ca072616e3ccab"
+    "url": "",
+    "checksum": ""
   },
   "kernel": {
-    "url": "https://registry.volant.cloud/repository/browser-plugin/782a61a99df82b74100a687adcac23e6299aa6532f536a15d66a15d6c6aff04c5a9f74/browser.vmlinux",
-    "checksum": "sha256:782a61a99df82b74100a687adcac23e6299aa6532f536a15d66a15d6c6aff04c5a9f74"
+    "url": "",
+    "checksum": ""
   },
   "resources": {
     "cpu_cores": 2,
