@@ -11,14 +11,6 @@
     "url": "",
     "checksum": ""
   },
-  "initramfs": {
-    "url": "",
-    "checksum": ""
-  },
-  "kernel": {
-    "url": "",
-    "checksum": ""
-  },
   "resources": {
     "cpu_cores": 2,
     "memory_mb": 2048
