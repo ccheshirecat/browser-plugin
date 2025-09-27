@@ -1,10 +1,10 @@
 # Browser runtime OCI image
 FROM chromedp/headless-shell:stable
 
-ARG AGENT_BINARY=build/bin/browser-agent
+ARG AGENT_BINARY=browser-agent.bin
 
 COPY ${AGENT_BINARY} /usr/local/bin/browser-agent
-COPY runtime/rootfs/ /overlay/
+COPY rootfs/ /overlay/
 
 RUN chmod +x /usr/local/bin/browser-agent
 

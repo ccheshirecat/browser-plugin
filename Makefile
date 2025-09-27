@@ -32,7 +32,9 @@ lint: ## Run go vet
 
 .PHONY: build-image
 build-image: build-agent ## Build OCI image for the browser runtime
-	docker build --build-arg AGENT_BINARY=build/bin/browser-agent -t $(IMAGE_TAG) runtime
+	cp build/bin/browser-agent runtime/browser-agent.bin
+	docker build --build-arg AGENT_BINARY=browser-agent.bin -t $(IMAGE_TAG) runtime
+	rm -f runtime/browser-agent.bin
 
 .PHONY: build-initramfs
 build-initramfs: build-image ## Produce initramfs archive and kernel snapshot

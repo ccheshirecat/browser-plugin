@@ -4,8 +4,6 @@ services:
     build:
       context: ..
       dockerfile: runtime/Dockerfile
-      args:
-        AGENT_BINARY: ${AGENT_BINARY:-build/bin/browser-agent}
     image: ${BROWSER_PLUGIN_IMAGE:-browser-plugin-smoke:local}
     ports:
       - "${BROWSER_PLUGIN_PORT:-18080}:8080"

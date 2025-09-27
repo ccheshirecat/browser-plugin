@@ -13,10 +13,11 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-mkdir -p "$BIN_DIR"
-
-echo "[smoke] building agent"
-GOOS=linux GOARCH=amd64 go build -o "$BIN_DIR/browser-agent" ./agent/cmd/browser-agent
+if [ ! -f "$BIN_DIR/browser-agent" ]; then
+  echo "browser-agent binary not found at $BIN_DIR/browser-agent" >&2
+  echo "Run 'make build' or 'make build-agent' first." >&2
+  exit 1
+fi
 
 pushd "$ROOT_DIR" >/dev/null
 
@@ -25,25 +26,46 @@ export BROWSER_PLUGIN_IMAGE="$IMAGE_TAG"
 export BROWSER_PLUGIN_PORT="$PORT"
 export AGENT_BINARY="$BIN_DIR/browser-agent"
 
+# Stage binary for docker build
+temp_agent="runtime/browser-agent.bin"
+cp "$AGENT_BINARY" "$temp_agent"
+
+cleanup_stage() {
+  rm -f "$temp_agent"
+}
+trap cleanup_stage EXIT
+
 echo "[smoke] building image"
 docker compose -f tests/integration/docker-compose.yaml build
 
-container_name="browser-plugin-smoke"
+cleanup_compose() {
+  docker compose -f tests/integration/docker-compose.yaml down -v --remove-orphans >/dev/null 2>&1 || true
+  cleanup_stage
+}
+trap cleanup_compose EXIT
+
 echo "[smoke] starting container"
 docker compose -f tests/integration/docker-compose.yaml up -d
 
 cleanup() {
   docker compose -f tests/integration/docker-compose.yaml down -v --remove-orphans >/dev/null 2>&1 || true
+  cleanup_stage
 }
 trap cleanup EXIT
 
 echo "[smoke] waiting for health"
-for _ in {1..30}; do
+deadline=$((SECONDS + 60))
+while (( SECONDS < deadline )); do
   if curl -sf "http://127.0.0.1:${PORT}/healthz" >/dev/null; then
     break
   fi
   sleep 1
-done
+fi
+
+if ! curl -sf "http://127.0.0.1:${PORT}/healthz" >/dev/null; then
+  echo "[smoke] health check failed" >&2
+  exit 1
+fi
 
 echo "[smoke] exercising navigate"
 curl -sf -X POST "http://127.0.0.1:${PORT}/v1/browser/navigate" \
