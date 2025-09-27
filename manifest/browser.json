@@ -23,7 +23,7 @@
     "navigate": {
       "description": "Navigate to URL",
       "method": "POST",
-      "path": "/v1/browser/navigate",
+      "path": "navigate",
       "timeout_ms": 60000
     }
   },

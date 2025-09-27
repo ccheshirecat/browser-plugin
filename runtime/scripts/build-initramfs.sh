@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ROOTFS_DIR="$REPO_ROOT/runtime/rootfs"
 
 OUTPUT_DIR=${OUTPUT_DIR:-$REPO_ROOT/build/artifacts}

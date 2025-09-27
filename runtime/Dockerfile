@@ -1,7 +1,7 @@
 # Browser runtime OCI image
 FROM chromedp/headless-shell:stable
 
-ARG AGENT_BINARY=runtime/browser-agent.bin
+ARG AGENT_BINARY=build/bin/browser-agent
 
 COPY ${AGENT_BINARY} /usr/local/bin/browser-agent
 COPY runtime/rootfs/ /overlay/

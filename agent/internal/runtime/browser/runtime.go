@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+
+	"github.com/ccheshirecat/volant/internal/pluginspec"
 )
 
 const Name = "browser"
@@ -18,12 +20,14 @@ type Options struct {
 	RemotePort     int
 	UserDataDir    string
 	ExecPath       string
+	Manifest       *pluginspec.Manifest
 }
 
 // Runtime exposes HTTP handlers backed by the Browser automation engine.
 type Runtime struct {
 	real           *Browser
 	defaultTimeout time.Duration
+	manifest       *pluginspec.Manifest
 }
 
 // New constructs a new browser runtime.
@@ -47,6 +51,7 @@ func New(ctx context.Context, opts Options) (*Runtime, error) {
 	return &Runtime{
 		real:           browser,
 		defaultTimeout: cfg.DefaultTimeout,
+		manifest:       opts.Manifest,
 	}, nil
 }
 
@@ -66,10 +71,19 @@ func (r *Runtime) BrowserInstance() *Browser { return r.real }
 
 // MountRoutes registers HTTP handlers.
 func (r *Runtime) MountRoutes(router chi.Router) {
+	r.mountRoutes(router, r.manifest)
+}
+
+func (r *Runtime) MountRoutesWithManifest(router chi.Router, manifest pluginspec.Manifest) error {
+	r.manifest = &manifest
+	r.mountRoutes(router, r.manifest)
+	return nil
+}
+
+func (r *Runtime) mountRoutes(router chi.Router, manifest *pluginspec.Manifest) {
 	router.Route("/browser", r.mountBrowserRoutes)
 	router.Route("/dom", r.mountDOMRoutes)
 	router.Route("/script", r.mountScriptRoutes)
-	router.Route("/actions", r.mountActionRoutes)
 	router.Route("/profile", r.mountProfileRoutes)
 }
 

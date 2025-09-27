@@ -6,15 +6,14 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"strings"
-	"time"
+	"strings"	"time"
 
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/network"
 	"github.com/go-chi/chi/v5"
 )
 
-func (r *Runtime) mountBrowserRoutes(router chi.Router) {
+	func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 	router.Post("/navigate", func(w http.ResponseWriter, req *http.Request) {
 		var payload navigateRequest
 		if err := decodeRequest(req, &payload); err != nil {
@@ -32,7 +31,7 @@ func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 		okJSON(w)
 	})
 
-	router.Post("/reload", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/reload", func(w http.ResponseWriter, req *http.Request) {
 		var payload reloadRequest
 		_ = decodeRequest(req, &payload)
 		if err := r.real.Reload(r.duration(payload.TimeoutMs), payload.IgnoreCache); err != nil {
@@ -42,7 +41,7 @@ func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 		okJSON(w)
 	})
 
-	router.Post("/back", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/back", func(w http.ResponseWriter, req *http.Request) {
 		if err := r.real.Back(r.duration(queryTimeout(req))); err != nil {
 			errorJSON(w, http.StatusInternalServerError, err)
 			return
@@ -50,7 +49,7 @@ func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 		okJSON(w)
 	})
 
-	router.Post("/forward", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/forward", func(w http.ResponseWriter, req *http.Request) {
 		if err := r.real.Forward(r.duration(queryTimeout(req))); err != nil {
 			errorJSON(w, http.StatusInternalServerError, err)
 			return
@@ -58,7 +57,7 @@ func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 		okJSON(w)
 	})
 
-	router.Post("/viewport", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/viewport", func(w http.ResponseWriter, req *http.Request) {
 		var payload viewportRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -71,7 +70,7 @@ func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 		okJSON(w)
 	})
 
-	router.Post("/user-agent", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/user-agent", func(w http.ResponseWriter, req *http.Request) {
 		var payload userAgentRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -84,7 +83,7 @@ func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 		okJSON(w)
 	})
 
-	router.Post("/wait-navigation", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/wait-navigation", func(w http.ResponseWriter, req *http.Request) {
 		var payload waitNavigationRequest
 		_ = decodeRequest(req, &payload)
 		if err := r.real.WaitForNavigation(r.duration(payload.TimeoutMs)); err != nil {

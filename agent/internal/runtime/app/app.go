@@ -15,6 +15,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/ccheshirecat/volant/internal/pluginspec"
 	"github.com/volant-plugins/browser/internal/runtime/browser"
 )
 
@@ -49,13 +50,23 @@ func Run(ctx context.Context) error {
 	cfg := loadConfig()
 	logger := log.New(os.Stdout, "browser-runtime: ", log.LstdFlags|log.LUTC)
 
-	runtimeInstance, err := browser.New(ctx, browser.Options{
+	manifest, err := resolveManifest()
+	if err != nil {
+		return err
+	}
+
+	options := browser.Options{
 		DefaultTimeout: cfg.DefaultTimeout,
 		RemoteAddr:     cfg.RemoteDebuggingAddr,
 		RemotePort:     cfg.RemoteDebuggingPort,
 		UserDataDir:    cfg.UserDataDir,
 		ExecPath:       cfg.ExecPath,
-	})
+	}
+	if manifest != nil {
+		options.Manifest = manifest
+	}
+
+	runtimeInstance, err := browser.New(ctx, options)
 	if err != nil {
 		return err
 	}
@@ -160,6 +171,18 @@ func parseDurationEnv(key string, fallback time.Duration) time.Duration {
 		}
 	}
 	return fallback
+}
+
+func resolveManifest() (*pluginspec.Manifest, error) {
+	encoded := strings.TrimSpace(os.Getenv("volant_MANIFEST"))
+	if encoded == "" {
+		return nil, nil
+	}
+	manifest, err := pluginspec.Decode(encoded)
+	if err != nil {
+		return nil, err
+	}
+	return &manifest, nil
 }
 
 func (a *App) handleHealth(w http.ResponseWriter, r *http.Request) {

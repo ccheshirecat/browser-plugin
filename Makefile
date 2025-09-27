@@ -5,15 +5,18 @@ BIN_DIR ?= $(BUILD_DIR)/bin
 ARTIFACTS_DIR ?= $(BUILD_DIR)/artifacts
 IMAGE_TAG ?= ghcr.io/volant-plugins/browser:dev
 INITRAMFS_NAME ?= browser-initramfs.cpio.gz
-MANIFEST_DIR ?= $(ROOT_DIR)/manifest
+
+.PHONY: help
+help: ## List available targets
+	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*##"} {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: build
 build: build-agent ## Build the browser agent binary
 
 .PHONY: build-agent
-build-agent: ## Compile the browser agent
+build-agent: ## Compile the browser agent (linux/amd64)
 	mkdir -p $(BIN_DIR)
-	cd agent && $(GO) build -o $(BIN_DIR)/browser-agent ./cmd/browser-agent
+	cd agent && GOOS=linux GOARCH=amd64 $(GO) build -o $(BIN_DIR)/browser-agent ./cmd/browser-agent
 
 .PHONY: test
 test: ## Run unit tests
@@ -24,26 +27,26 @@ fmt: ## Format Go sources
 	cd agent && $(GO) fmt ./...
 
 .PHONY: lint
-lint: ## Run go vet on the agent module
+lint: ## Run go vet
 	cd agent && $(GO) vet ./...
 
 .PHONY: build-image
 build-image: build-agent ## Build OCI image for the browser runtime
-	cd runtime && IMAGE_TAG=$(IMAGE_TAG) bash -c 'set -euo pipefail; cp ../build/bin/browser-agent browser-agent.bin; trap "rm -f browser-agent.bin" EXIT; docker build --build-arg AGENT_BINARY=browser-agent.bin -t "$$IMAGE_TAG" .'
+	docker build --build-arg AGENT_BINARY=build/bin/browser-agent -t $(IMAGE_TAG) runtime
 
 .PHONY: build-initramfs
-build-initramfs: build-image ## Produce initramfs archive and kernel
+build-initramfs: build-image ## Produce initramfs archive and kernel snapshot
 	mkdir -p $(ARTIFACTS_DIR)
 	OUTPUT_DIR=$(ARTIFACTS_DIR) AGENT_BIN=$(BIN_DIR)/browser-agent IMAGE_TAG=$(IMAGE_TAG) INITRAMFS_NAME=$(INITRAMFS_NAME) \
-		bash runtime/scripts/build-initramfs.sh
+		runtime/scripts/build-initramfs.sh
 
 .PHONY: build-kernel
 build-kernel: ## Fetch pinned kernel if needed
-	bash runtime/scripts/build-kernel.sh $(ARTIFACTS_DIR)
+	runtime/scripts/build-kernel.sh $(ARTIFACTS_DIR)
 
 .PHONY: smoke-test
-smoke-test: ## Run smoke tests against local runtime
-	bash runtime/scripts/smoke-test.sh
+smoke-test: build-agent ## Run smoke tests against local runtime
+	IMAGE_TAG=$(IMAGE_TAG) AGENT_BINARY=build/bin/browser-agent tests/integration/smoke-test.sh
 
 .PHONY: clean
 clean:
