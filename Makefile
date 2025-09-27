@@ -1,7 +1,6 @@
 GO ?= go
 ROOT_DIR := $(shell pwd)
 BUILD_DIR ?= $(ROOT_DIR)/build
-ARTIFACTS_DIR ?= $(BUILD_DIR)/build
 SCRIPTS_DIR ?= $(ROOT_DIR)/scripts
 IMAGE_TAG ?= docker.io/chromedp/headless-shell:latest
 IMAGE_DIGEST ?= sha256:8a59f11326194bd44e7ae86041e33aa22603291c329b02e0c8031c2d68574cc0
@@ -25,10 +24,10 @@ lint: ## Run go vet
 
 .PHONY: build
 build:  ## Build OCI image for the browser runtime
-	$(SCRIPTS_DIR)/oci2disk.sh $(IMAGE_TAG) $(ARTIFACTS_DIR)/rootfs.img
+	$(SCRIPTS_DIR)/oci2disk.sh $(IMAGE_TAG) $(BUILD_DIR)/rootfs.img
 	sed -i 's|"image": "",|"image": "$(IMAGE_TAG)",|' manifest/browser.json
 	sed -i 's|"image_digest": "",|"image_digest": "$(IMAGE_DIGEST)",|' manifest/browser.json
-	sed -i '/"rootfs":/,/"}/{ s|"url": "",|"url": "$(ARTIFACTS_DIR)/rootfs.img",|; }' manifest/browser.json
+	sed -i '/"rootfs":/,/"}/{ s|"url": "",|"url": "$(BUILD_DIR)/rootfs.img",|; }' manifest/browser.json
 	sed -i '/"rootfs":/,/"}/{ s|"checksum": "",|"checksum": "$(IMAGE_DIGEST)",|; }' manifest/browser.json
 	echo "Build complete, run install-plugin to install the plugin with the built manifest"
 
