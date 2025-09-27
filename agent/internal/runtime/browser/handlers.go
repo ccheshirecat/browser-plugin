@@ -6,15 +6,15 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"strings"	
-        "time"
+	"strings"
+	"time"
 
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/network"
 	"github.com/go-chi/chi/v5"
 )
 
-	func (r *Runtime) mountBrowserRoutes(router chi.Router) {
+func (r *Runtime) mountBrowserRoutes(router chi.Router) {
 	router.Post("/navigate", func(w http.ResponseWriter, req *http.Request) {
 		var payload navigateRequest
 		if err := decodeRequest(req, &payload); err != nil {
@@ -32,7 +32,7 @@ import (
 		okJSON(w)
 	})
 
-	router.Handle(http.MethodPost, "/reload", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/reload", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload reloadRequest
 		_ = decodeRequest(req, &payload)
 		if err := r.real.Reload(r.duration(payload.TimeoutMs), payload.IgnoreCache); err != nil {
@@ -40,25 +40,25 @@ import (
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Handle(http.MethodPost, "/back", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/back", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if err := r.real.Back(r.duration(queryTimeout(req))); err != nil {
 			errorJSON(w, http.StatusInternalServerError, err)
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Handle(http.MethodPost, "/forward", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/forward", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if err := r.real.Forward(r.duration(queryTimeout(req))); err != nil {
 			errorJSON(w, http.StatusInternalServerError, err)
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Handle(http.MethodPost, "/viewport", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/viewport", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload viewportRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -69,9 +69,9 @@ import (
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Handle(http.MethodPost, "/user-agent", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/user-agent", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload userAgentRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -82,9 +82,9 @@ import (
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Handle(http.MethodPost, "/wait-navigation", func(w http.ResponseWriter, req *http.Request) {
+	router.Handle(http.MethodPost, "/wait-navigation", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload waitNavigationRequest
 		_ = decodeRequest(req, &payload)
 		if err := r.real.WaitForNavigation(r.duration(payload.TimeoutMs)); err != nil {
@@ -92,9 +92,9 @@ import (
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Post("/screenshot", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/screenshot", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload screenshotRequest
 		_ = decodeRequest(req, &payload)
 		data, err := r.real.Screenshot(r.duration(payload.TimeoutMs), payload.FullPage, payload.Format, payload.Quality)
@@ -109,11 +109,11 @@ import (
 			"byte_length": len(data),
 			"captured_at": time.Now().UTC().Format(time.RFC3339Nano),
 		})
-	})
+	}))
 }
 
 func (r *Runtime) mountDOMRoutes(router chi.Router) {
-	router.Post("/click", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/click", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload clickRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -124,9 +124,9 @@ func (r *Runtime) mountDOMRoutes(router chi.Router) {
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Post("/type", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/type", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload typeRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -137,9 +137,9 @@ func (r *Runtime) mountDOMRoutes(router chi.Router) {
 			return
 		}
 		okJSON(w)
-	})
+	}))
 
-	router.Post("/get-text", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/get-text", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload textRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -151,9 +151,9 @@ func (r *Runtime) mountDOMRoutes(router chi.Router) {
 			return
 		}
 		respondJSON(w, http.StatusOK, map[string]any{"text": text})
-	})
+	}))
 
-	router.Post("/get-html", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/get-html", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload htmlRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -165,9 +165,9 @@ func (r *Runtime) mountDOMRoutes(router chi.Router) {
 			return
 		}
 		respondJSON(w, http.StatusOK, map[string]any{"html": html})
-	})
+	}))
 
-	router.Post("/get-attribute", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/get-attribute", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload attributeRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -179,9 +179,9 @@ func (r *Runtime) mountDOMRoutes(router chi.Router) {
 			return
 		}
 		respondJSON(w, http.StatusOK, map[string]any{"value": value, "exists": ok})
-	})
+	}))
 
-	router.Post("/wait-selector", func(w http.ResponseWriter, req *http.Request) {
+	router.Post("/wait-selector", http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var payload waitSelectorRequest
 		if err := decodeRequest(req, &payload); err != nil {
 			errorJSON(w, http.StatusBadRequest, err)
@@ -192,7 +192,7 @@ func (r *Runtime) mountDOMRoutes(router chi.Router) {
 			return
 		}
 		okJSON(w)
-	})
+	}))
 }
 
 func (r *Runtime) mountScriptRoutes(router chi.Router) {

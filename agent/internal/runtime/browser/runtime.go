@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/ccheshirecat/volant/internal/pluginspec"
+	pluginspec "github.com/ccheshirecat/volant/pkg/pluginspec"
 )
 
 const Name = "browser"

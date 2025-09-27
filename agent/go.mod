@@ -3,13 +3,13 @@ module github.com/volant-plugins/browser
 go 1.24
 
 require (
+	github.com/ccheshirecat/volant/pkg/pluginspec v0.0.0-00010101000000-000000000000
 	github.com/chromedp/cdproto v0.0.0-20250724212937-08a3db8b4327
 	github.com/chromedp/chromedp v0.14.1
 	github.com/go-chi/chi/v5 v5.0.12
 )
 
 require (
-	github.com/ccheshirecat/volant v0.0.0-20250927031049-cb92cdd98f48 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
@@ -17,3 +17,5 @@ require (
 	github.com/gobwas/ws v1.4.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 )
+
+replace github.com/ccheshirecat/volant/pkg/pluginspec => ../../volant/pkg/pluginspec
